@@ -272,7 +272,9 @@ aws iam get-role --role-name factorio-server-role
 
 3. **Factorio Credentials**: Store your Factorio username/token securely. Consider using AWS Secrets Manager for production.
 
-4. **Updates**: Regularly update the server and OS packages.
+4. **SSH Security**: The management scripts disable strict host key checking for convenience. In production environments, consider maintaining a known_hosts file for enhanced security.
+
+5. **Updates**: Regularly update the server and OS packages.
 
 ## Cleanup
 

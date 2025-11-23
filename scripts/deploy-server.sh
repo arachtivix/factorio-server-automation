@@ -122,6 +122,7 @@ EOF
 aws s3 cp s3://${S3_BUCKET_NAME}/scripts/ /opt/factorio/scripts/ --recursive --region ${AWS_REGION} || true
 
 # Create systemd service
+# Note: Factorio tarball extracts to 'factorio/' so the binary is at bin/bin/x64/factorio
 cat > /etc/systemd/system/factorio.service <<EOF
 [Unit]
 Description=Factorio Dedicated Server

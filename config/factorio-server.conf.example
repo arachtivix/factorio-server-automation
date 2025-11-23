@@ -16,6 +16,9 @@ FACTORIO_SERVER_NAME="My Factorio Server"
 FACTORIO_DESCRIPTION="Automated Factorio Server on AWS"
 FACTORIO_MAX_PLAYERS=10
 FACTORIO_VISIBILITY_PUBLIC=false
+# Get your username and token from https://factorio.com/profile
+# NOTE: These credentials will be stored in the EC2 instance. 
+# For production, consider using AWS Secrets Manager.
 FACTORIO_USERNAME=""
 FACTORIO_TOKEN=""
 
@@ -28,4 +31,6 @@ BACKUP_INTERVAL_HOURS=6
 AUTO_BACKUP_ENABLED=true
 
 # Security
+# WARNING: Default allows SSH from anywhere. Restrict to your IP for better security!
+# Example: ALLOWED_CIDR_BLOCKS=203.0.113.42/32
 ALLOWED_CIDR_BLOCKS=0.0.0.0/0
