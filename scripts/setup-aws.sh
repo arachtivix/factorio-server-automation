@@ -240,7 +240,7 @@ allowed_cidr_blocks      = "$ALLOWED_CIDR_BLOCKS"
 vpc_id                   = "$vpc_id"
 EOF
     
-    # Create backend configuration file
+    # Create backend configuration file and initialize Terraform
     cat > backend.conf <<EOF
 bucket = "$bucket_name"
 key    = "terraform-state/terraform.tfstate"
