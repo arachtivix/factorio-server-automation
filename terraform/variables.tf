@@ -1,12 +1,6 @@
-variable "aws_region" {
-  description = "AWS region for resources"
+variable "s3_bucket_name" {
+  description = "Name of the S3 bucket for Factorio server data"
   type        = string
-}
-
-variable "s3_bucket_prefix" {
-  description = "Prefix for S3 bucket name"
-  type        = string
-  default     = "factorio-server"
 }
 
 variable "s3_backup_retention_days" {

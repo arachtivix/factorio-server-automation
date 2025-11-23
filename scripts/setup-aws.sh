@@ -7,6 +7,9 @@
 
 set -euo pipefail
 
+# Hard-coded region
+AWS_REGION="us-east-1"
+
 # Colors for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -75,6 +78,44 @@ check_prerequisites() {
     log_info "✓ Terraform is installed (version $tf_version)"
 }
 
+generate_random_suffix() {
+    # Generate 9 random alphanumeric characters
+    LC_ALL=C tr -dc 'a-z0-9' < /dev/urandom | head -c 9
+}
+
+get_or_create_bucket_name() {
+    log_section "Determining S3 Bucket Name"
+    
+    local param_name="factorio_server_s3_bucket"
+    local bucket_name=""
+    
+    # Try to get bucket name from Parameter Store
+    log_info "Checking Parameter Store for $param_name..."
+    bucket_name=$(aws ssm get-parameter --name "$param_name" --query 'Parameter.Value' --output text --region "$AWS_REGION" 2>/dev/null || echo "")
+    
+    if [ -n "$bucket_name" ] && [ "$bucket_name" != "None" ]; then
+        log_info "Found existing bucket name in Parameter Store: $bucket_name"
+    else
+        log_info "Parameter not found. Generating new bucket name..."
+        local random_suffix=$(generate_random_suffix)
+        bucket_name="factorio-${random_suffix}"
+        log_info "Generated bucket name: $bucket_name"
+        
+        # Store the bucket name in Parameter Store
+        log_info "Saving bucket name to Parameter Store..."
+        aws ssm put-parameter \
+            --name "$param_name" \
+            --value "$bucket_name" \
+            --type "String" \
+            --description "S3 bucket name for Factorio server automation" \
+            --region "$AWS_REGION" \
+            --overwrite > /dev/null
+        log_info "Saved bucket name to Parameter Store"
+    fi
+    
+    echo "$bucket_name"
+}
+
 select_vpc() {
     log_info "Selecting VPC for Factorio server..."
     
@@ -138,21 +179,17 @@ select_vpc() {
 }
 
 setup_s3_backend() {
-    local bucket_name="${S3_BUCKET_PREFIX}-$(aws sts get-caller-identity --query Account --output text)"
+    local bucket_name=$1
     
     log_section "Setting up S3 Backend for Terraform"
     
     # Check if bucket exists
-    if aws s3 ls "s3://$bucket_name" 2>/dev/null; then
+    if aws s3 ls "s3://$bucket_name" --region "$AWS_REGION" 2>/dev/null; then
         log_info "S3 bucket $bucket_name already exists"
     else
         log_info "Creating S3 bucket: $bucket_name"
-        if [ "$AWS_REGION" = "us-east-1" ]; then
-            aws s3 mb "s3://$bucket_name" --region "$AWS_REGION"
-        else
-            aws s3 mb "s3://$bucket_name" --region "$AWS_REGION" \
-                --create-bucket-configuration LocationConstraint="$AWS_REGION"
-        fi
+        # us-east-1 doesn't need LocationConstraint
+        aws s3 mb "s3://$bucket_name" --region "$AWS_REGION"
         log_info "Created S3 bucket: $bucket_name"
     fi
     
@@ -196,8 +233,7 @@ run_terraform() {
     
     # Create tfvars file
     cat > terraform.tfvars <<EOF
-aws_region               = "$AWS_REGION"
-s3_bucket_prefix         = "$S3_BUCKET_PREFIX"
+s3_bucket_name           = "$bucket_name"
 s3_backup_retention_days = $S3_BACKUP_RETENTION_DAYS
 key_pair_name            = "$KEY_PAIR_NAME"
 allowed_cidr_blocks      = "$ALLOWED_CIDR_BLOCKS"
@@ -237,16 +273,19 @@ EOF
 
 main() {
     log_section "Factorio Server AWS Setup (Terraform)"
-    log_info "Region: $AWS_REGION"
+    log_info "Region: us-east-1 (hard-coded)"
     
     # Check prerequisites
     check_prerequisites
+    
+    # Get or generate S3 bucket name from Parameter Store
+    BUCKET_NAME=$(get_or_create_bucket_name)
     
     # Select VPC
     VPC_ID=$(select_vpc)
     
     # Setup S3 backend
-    BUCKET_NAME=$(setup_s3_backend)
+    setup_s3_backend "$BUCKET_NAME"
     
     # Generate SSH key pair
     generate_key_pair

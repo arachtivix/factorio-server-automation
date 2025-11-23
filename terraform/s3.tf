@@ -2,7 +2,7 @@ data "aws_caller_identity" "current" {}
 
 # S3 Bucket for Factorio server data
 resource "aws_s3_bucket" "factorio_server" {
-  bucket = "${var.s3_bucket_prefix}-${data.aws_caller_identity.current.account_id}"
+  bucket = var.s3_bucket_name
 
   tags = {
     Name        = "Factorio Server Data"

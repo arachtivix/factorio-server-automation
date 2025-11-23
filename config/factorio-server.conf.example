@@ -2,12 +2,13 @@
 # Copy this file to factorio-server.conf and update with your values
 
 # AWS Configuration
-AWS_REGION=us-east-1
+# Region is hard-coded to us-east-1
 EC2_INSTANCE_TYPE=t3.medium
 KEY_PAIR_NAME=factorio-server-key
 
-# S3 Bucket Configuration (will be created by setup)
-S3_BUCKET_PREFIX=factorio-server
+# S3 Bucket Configuration
+# Bucket name is managed via AWS Systems Manager Parameter Store
+# The setup script will check for parameter: factorio_server_s3_bucket
 S3_BACKUP_RETENTION_DAYS=30
 
 # Factorio Server Configuration

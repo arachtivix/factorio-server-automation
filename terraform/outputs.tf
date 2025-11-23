@@ -19,8 +19,8 @@ output "security_group_id" {
 }
 
 output "aws_region" {
-  description = "AWS region"
-  value       = var.aws_region
+  description = "AWS region (hard-coded to us-east-1)"
+  value       = "us-east-1"
 }
 
 output "key_pair_name" {
