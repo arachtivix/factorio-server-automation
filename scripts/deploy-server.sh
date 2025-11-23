@@ -62,6 +62,8 @@ set -euo pipefail
 
 # Install dependencies
 yum update -y
+# Install jq from EPEL for Amazon Linux 2
+amazon-linux-extras install epel -y || true
 yum install -y wget tar xz jq awscli
 
 # Create factorio user
@@ -164,7 +166,7 @@ if [ "${AUTO_BACKUP_ENABLED}" = "true" ]; then
     echo "0 */${BACKUP_INTERVAL_HOURS} * * * /opt/factorio/scripts/backup.sh" | crontab -u factorio -
 fi
 
-log_info "Factorio server installation completed"
+echo "Factorio server installation completed"
 USERDATA
 
     # Replace variables in user data

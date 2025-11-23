@@ -96,8 +96,8 @@ backup_current_version() {
     
     log_info "Backing up current server version..."
     
-    # Get current version info
-    local current_version=$(ssh_exec "$instance_ip" "cat /opt/factorio/bin/data/base/info.json 2>/dev/null | jq -r .version" || echo "unknown")
+    # Get current version info (with fallback if jq not available)
+    local current_version=$(ssh_exec "$instance_ip" "if command -v jq &>/dev/null; then cat /opt/factorio/bin/data/base/info.json 2>/dev/null | jq -r .version; else grep -o '\"version\": \"[^\"]*\"' /opt/factorio/bin/data/base/info.json 2>/dev/null | cut -d'\"' -f4; fi" || echo "unknown")
     
     log_info "Current version: $current_version"
     log_info "Backing up to S3..."
@@ -183,9 +183,9 @@ deploy_version() {
     log_info "Starting Factorio server..."
     ssh_exec "$instance_ip" "sudo systemctl start factorio"
     
-    # Verify version
+    # Verify version (with fallback if jq not available)
     sleep 5
-    local new_version=$(ssh_exec "$instance_ip" "cat /opt/factorio/bin/data/base/info.json | jq -r .version")
+    local new_version=$(ssh_exec "$instance_ip" "if command -v jq &>/dev/null; then cat /opt/factorio/bin/data/base/info.json | jq -r .version; else grep -o '\"version\": \"[^\"]*\"' /opt/factorio/bin/data/base/info.json | cut -d'\"' -f4; fi")
     
     log_info "Successfully deployed version: $new_version"
     log_info "Server is starting up. Check status with: sudo systemctl status factorio"
@@ -340,7 +340,7 @@ show_status() {
     
     echo ""
     log_info "Server Version:"
-    ssh_exec "$instance_ip" "cat /opt/factorio/bin/data/base/info.json 2>/dev/null | jq -r .version" || log_warn "Could not determine version"
+    ssh_exec "$instance_ip" "if command -v jq &>/dev/null; then cat /opt/factorio/bin/data/base/info.json 2>/dev/null | jq -r .version; else grep -o '\"version\": \"[^\"]*\"' /opt/factorio/bin/data/base/info.json 2>/dev/null | cut -d'\"' -f4; fi" || log_warn "Could not determine version"
     
     echo ""
     log_info "Service Status:"
