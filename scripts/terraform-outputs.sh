@@ -17,6 +17,11 @@ init_terraform() {
         return 1
     fi
     
+    # Check if terraform is already initialized
+    if [ -f "$terraform_dir/.terraform/terraform.tfstate" ]; then
+        return 0
+    fi
+    
     # Get bucket name from Parameter Store
     local param_name="factorio_server_s3_bucket"
     local bucket_name=""
@@ -37,7 +42,8 @@ region = "$AWS_REGION"
 EOF
     
     # Initialize Terraform with backend configuration
-    terraform init -backend-config=backend.conf >/dev/null 2>&1
+    # Suppress stdout but preserve stderr for debugging
+    terraform init -backend-config=backend.conf >/dev/null
     local init_exit_code=$?
     cd - > /dev/null || return 1
     
