@@ -170,10 +170,71 @@ create_iam_role() {
     echo "$role_name"
 }
 
+select_vpc() {
+    log_info "Selecting VPC for Factorio server..."
+    
+    # Get all VPCs in the region
+    local vpc_count=$(aws ec2 describe-vpcs \
+        --query "length(Vpcs)" --output text --region "$AWS_REGION")
+    
+    if [ "$vpc_count" -eq 0 ]; then
+        log_error "No VPCs found in region $AWS_REGION"
+        exit 1
+    fi
+    
+    # If there's only one VPC, use it automatically
+    if [ "$vpc_count" -eq 1 ]; then
+        local vpc_id=$(aws ec2 describe-vpcs \
+            --query "Vpcs[0].VpcId" --output text --region "$AWS_REGION")
+        local vpc_name=$(aws ec2 describe-vpcs --vpc-ids "$vpc_id" \
+            --query "Vpcs[0].Tags[?Key=='Name'].Value | [0]" --output text --region "$AWS_REGION" 2>/dev/null || echo "")
+        log_info "Using VPC: $vpc_id $([ -n "$vpc_name" ] && [ "$vpc_name" != "None" ] && echo "($vpc_name)" || echo "")"
+        echo "$vpc_id"
+        return
+    fi
+    
+    # Multiple VPCs - let user choose
+    log_info "Found $vpc_count VPCs in region $AWS_REGION"
+    echo ""
+    
+    # Get VPC details and display them
+    local vpc_ids=($(aws ec2 describe-vpcs \
+        --query "Vpcs[*].VpcId" --output text --region "$AWS_REGION"))
+    
+    local index=1
+    for vpc_id in "${vpc_ids[@]}"; do
+        local vpc_name=$(aws ec2 describe-vpcs --vpc-ids "$vpc_id" \
+            --query "Vpcs[0].Tags[?Key=='Name'].Value | [0]" --output text --region "$AWS_REGION" 2>/dev/null || echo "")
+        local is_default=$(aws ec2 describe-vpcs --vpc-ids "$vpc_id" \
+            --query "Vpcs[0].IsDefault" --output text --region "$AWS_REGION")
+        local cidr=$(aws ec2 describe-vpcs --vpc-ids "$vpc_id" \
+            --query "Vpcs[0].CidrBlock" --output text --region "$AWS_REGION")
+        
+        echo -n "  $index) $vpc_id - $cidr"
+        [ "$is_default" = "true" ] && echo -n " (default)"
+        [ -n "$vpc_name" ] && [ "$vpc_name" != "None" ] && echo -n " - $vpc_name"
+        echo ""
+        ((index++))
+    done
+    
+    echo ""
+    read -p "Select VPC (1-$vpc_count): " selection
+    
+    # Validate selection
+    if ! [[ "$selection" =~ ^[0-9]+$ ]] || [ "$selection" -lt 1 ] || [ "$selection" -gt "$vpc_count" ]; then
+        log_error "Invalid selection. Please enter a number between 1 and $vpc_count"
+        exit 1
+    fi
+    
+    # Return selected VPC ID
+    local selected_vpc="${vpc_ids[$((selection-1))]}"
+    log_info "Selected VPC: $selected_vpc"
+    echo "$selected_vpc"
+}
+
 create_security_group() {
     local sg_name="factorio-server-sg"
-    local vpc_id=$(aws ec2 describe-vpcs --filters "Name=isDefault,Values=true" \
-        --query "Vpcs[0].VpcId" --output text --region "$AWS_REGION")
+    local vpc_id=$(select_vpc)
     
     log_info "Creating security group: $sg_name"
     
