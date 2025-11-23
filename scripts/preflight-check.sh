@@ -79,6 +79,18 @@ else
     ((WARN++))
 fi
 
+# Check Terraform
+echo "Checking Terraform..."
+if command -v terraform &> /dev/null; then
+    TF_VERSION=$(terraform version -json 2>/dev/null | jq -r '.terraform_version' 2>/dev/null || terraform version | head -1 | awk '{print $2}' | sed 's/v//')
+    check_pass "Terraform installed (version $TF_VERSION)"
+    ((PASS++))
+else
+    check_fail "Terraform not installed (required for AWS setup)"
+    echo "  Install: https://www.terraform.io/downloads"
+    ((FAIL++))
+fi
+
 # Check SSH
 echo "Checking SSH client..."
 if command -v ssh &> /dev/null; then

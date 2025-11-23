@@ -3,6 +3,8 @@
 *.tfstate.*
 .terraform/
 .terraform.lock.hcl
+terraform.tfvars
+backend.conf
 
 # AWS credentials
 *.pem
