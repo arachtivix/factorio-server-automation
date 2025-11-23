@@ -25,12 +25,12 @@ else
     exit 1
 fi
 
-if [ -f "$CONFIG_DIR/aws-resources.conf" ]; then
-    source "$CONFIG_DIR/aws-resources.conf"
-else
-    echo -e "${RED}Error: AWS resources not configured. Run scripts/setup-aws.sh first.${NC}"
+# Load Terraform outputs
+source "$SCRIPT_DIR/terraform-outputs.sh"
+load_terraform_outputs || {
+    echo -e "${RED}Error: Could not load Terraform outputs. Run scripts/setup-aws.sh first.${NC}"
     exit 1
-fi
+}
 
 # Functions
 log_info() {

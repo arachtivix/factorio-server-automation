@@ -8,15 +8,13 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
-CONFIG_DIR="$PROJECT_ROOT/config"
 
-# Load configuration
-if [ -f "$CONFIG_DIR/aws-resources.conf" ]; then
-    source "$CONFIG_DIR/aws-resources.conf"
-else
-    echo "Error: AWS resources not configured. Run scripts/setup-aws.sh first."
+# Load Terraform outputs
+source "$SCRIPT_DIR/terraform-outputs.sh"
+load_terraform_outputs || {
+    echo "Error: Could not load Terraform outputs. Run scripts/setup-aws.sh first."
     exit 1
-fi
+}
 
 echo "Looking for running Factorio server instance..."
 

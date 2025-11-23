@@ -23,8 +23,12 @@ if [ -f "$CONFIG_DIR/factorio-server.conf" ]; then
     source "$CONFIG_DIR/factorio-server.conf"
 fi
 
-if [ -f "$CONFIG_DIR/aws-resources.conf" ]; then
-    source "$CONFIG_DIR/aws-resources.conf"
+# Load Terraform outputs
+source "$SCRIPT_DIR/terraform-outputs.sh"
+if ! load_terraform_outputs 2>/dev/null; then
+    # If Terraform outputs can't be loaded, we may still be able to run some commands
+    # but commands that need AWS resources will fail with appropriate error messages
+    :
 fi
 
 # Functions

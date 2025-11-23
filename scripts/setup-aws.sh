@@ -235,37 +235,6 @@ EOF
     cd "$PROJECT_ROOT"
 }
 
-save_outputs() {
-    log_section "Saving Terraform Outputs"
-    
-    cd "$TERRAFORM_DIR"
-    
-    # Get outputs from Terraform
-    local s3_bucket=$(terraform output -raw s3_bucket_name)
-    local iam_role=$(terraform output -raw iam_role_name)
-    local iam_profile=$(terraform output -raw iam_instance_profile)
-    local sg_id=$(terraform output -raw security_group_id)
-    local vpc_id=$(terraform output -raw vpc_id)
-    
-    # Save to config file
-    cat > "$CONFIG_DIR/aws-resources.conf" <<EOF
-# Auto-generated AWS resource configuration (from Terraform)
-# Generated on: $(date)
-
-S3_BUCKET_NAME=$s3_bucket
-IAM_ROLE_NAME=$iam_role
-IAM_INSTANCE_PROFILE=$iam_profile
-SECURITY_GROUP_ID=$sg_id
-VPC_ID=$vpc_id
-AWS_REGION=$AWS_REGION
-KEY_PAIR_NAME=$KEY_PAIR_NAME
-EOF
-    
-    log_info "Saved AWS resource configuration to $CONFIG_DIR/aws-resources.conf"
-    
-    cd "$PROJECT_ROOT"
-}
-
 main() {
     log_section "Factorio Server AWS Setup (Terraform)"
     log_info "Region: $AWS_REGION"
@@ -285,18 +254,16 @@ main() {
     # Run Terraform
     run_terraform "$VPC_ID" "$BUCKET_NAME"
     
-    # Save outputs
-    save_outputs
-    
     log_section "Setup Completed Successfully!"
     log_info "S3 Bucket: $BUCKET_NAME"
     log_info "VPC: $VPC_ID"
     log_info "Key Pair: $KEY_PAIR_NAME"
     log_info ""
+    log_info "Terraform state is stored in S3 at: s3://$BUCKET_NAME/terraform-state/terraform.tfstate"
+    log_info ""
     log_info "Next steps:"
-    log_info "1. Review the configuration in config/aws-resources.conf"
-    log_info "2. Use scripts/deploy-server.sh to launch your Factorio server"
-    log_info "3. Use scripts/manage-factorio.sh to manage server versions and mods"
+    log_info "1. Use scripts/deploy-server.sh to launch your Factorio server"
+    log_info "2. Use scripts/manage-factorio.sh to manage server versions and mods"
 }
 
 main "$@"

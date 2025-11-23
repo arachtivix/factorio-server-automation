@@ -220,9 +220,9 @@ Main configuration file with AWS and Factorio settings.
 
 List of mods to install on the server.
 
-### config/aws-resources.conf
+### Terraform State
 
-Auto-generated file containing AWS resource IDs (created by setup-aws.sh).
+Terraform state is stored in S3 at `terraform-state/terraform.tfstate` within the bucket. All scripts read AWS resource information directly from Terraform outputs using the `terraform output` command.
 
 ### config/iam-policy-server-role.json
 

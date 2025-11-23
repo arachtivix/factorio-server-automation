@@ -12,6 +12,7 @@ backend.conf
 
 # Configuration files with secrets
 config/secrets.env
+config/aws-resources.conf
 
 # Logs
 *.log

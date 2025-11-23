@@ -70,14 +70,14 @@ FACTORIO_VISIBILITY_PUBLIC=true        # Make server public
 [INFO] Creating new key pair: factorio-server-key
 [INFO] Created key pair and saved to factorio-server-key.pem
 [WARN] IMPORTANT: Keep this key file safe! It's required to access your server.
-[INFO] Saved AWS resource configuration to config/aws-resources.conf
 ==========================================
 [INFO] Setup completed successfully!
 ==========================================
 [INFO] S3 Bucket: factorio-server-123456789012
-[INFO] IAM Role: factorio-server-role
-[INFO] Security Group: sg-0123456789abcdef
+[INFO] VPC: vpc-0123456789abcdef
 [INFO] Key Pair: factorio-server-key
+[INFO] 
+[INFO] Terraform state is stored in S3 at: s3://factorio-server-123456789012/terraform-state/terraform.tfstate
 ```
 
 **What was created:**
