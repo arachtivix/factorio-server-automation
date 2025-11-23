@@ -141,7 +141,7 @@ select_vpc() {
     
     # Multiple VPCs - let user choose
     log_info "Found $vpc_count VPCs in region $AWS_REGION"
-    echo ""
+    echo "" >&2
     
     # Get VPC details and display them
     local vpc_ids=($(aws ec2 describe-vpcs \
@@ -156,14 +156,14 @@ select_vpc() {
         local cidr=$(aws ec2 describe-vpcs --vpc-ids "$vpc_id" \
             --query "Vpcs[0].CidrBlock" --output text --region "$AWS_REGION")
         
-        echo -n "  $index) $vpc_id - $cidr"
-        [ "$is_default" = "true" ] && echo -n " (default)"
-        [ -n "$vpc_name" ] && [ "$vpc_name" != "None" ] && echo -n " - $vpc_name"
-        echo ""
+        echo -n "  $index) $vpc_id - $cidr" >&2
+        [ "$is_default" = "true" ] && echo -n " (default)" >&2
+        [ -n "$vpc_name" ] && [ "$vpc_name" != "None" ] && echo -n " - $vpc_name" >&2
+        echo "" >&2
         ((index++))
     done
     
-    echo ""
+    echo "" >&2
     read -p "Select VPC (1-$vpc_count): " selection
     
     # Validate selection
