@@ -1,0 +1,37 @@
+# Factorio Server Configuration
+# Copy this file to factorio-server.conf and update with your values
+
+# AWS Configuration
+# Region is hard-coded to us-east-1
+EC2_INSTANCE_TYPE=t3.medium
+KEY_PAIR_NAME=factorio-server-key
+
+# S3 Bucket Configuration
+# Bucket name is managed via AWS Systems Manager Parameter Store
+# The setup script will check for parameter: factorio_server_s3_bucket
+S3_BACKUP_RETENTION_DAYS=30
+
+# Factorio Server Configuration
+FACTORIO_VERSION=stable
+FACTORIO_SERVER_NAME="My Factorio Server"
+FACTORIO_DESCRIPTION="Automated Factorio Server on AWS"
+FACTORIO_MAX_PLAYERS=10
+FACTORIO_VISIBILITY_PUBLIC=false
+# Get your username and token from https://factorio.com/profile
+# NOTE: These credentials will be stored in the EC2 instance. 
+# For production, consider using AWS Secrets Manager.
+FACTORIO_USERNAME=""
+FACTORIO_TOKEN=""
+
+# Mod Configuration
+ENABLE_MODS=true
+MOD_LIST_FILE=config/mods.json
+
+# Backup Configuration
+BACKUP_INTERVAL_HOURS=6
+AUTO_BACKUP_ENABLED=true
+
+# Security
+# WARNING: Default allows SSH from anywhere. Restrict to your IP for better security!
+# Example: ALLOWED_CIDR_BLOCKS=203.0.113.42/32
+ALLOWED_CIDR_BLOCKS=0.0.0.0/0
