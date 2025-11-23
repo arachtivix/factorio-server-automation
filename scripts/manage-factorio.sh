@@ -33,21 +33,21 @@ fi
 
 # Functions
 log_info() {
-    echo -e "${GREEN}[INFO]${NC} $1"
+    echo -e "${GREEN}[INFO]${NC} $1" >&2
 }
 
 log_warn() {
-    echo -e "${YELLOW}[WARN]${NC} $1"
+    echo -e "${YELLOW}[WARN]${NC} $1" >&2
 }
 
 log_error() {
-    echo -e "${RED}[ERROR]${NC} $1"
+    echo -e "${RED}[ERROR]${NC} $1" >&2
 }
 
 log_section() {
-    echo -e "${BLUE}========================================${NC}"
-    echo -e "${BLUE}$1${NC}"
-    echo -e "${BLUE}========================================${NC}"
+    echo -e "${BLUE}========================================${NC}" >&2
+    echo -e "${BLUE}$1${NC}" >&2
+    echo -e "${BLUE}========================================${NC}" >&2
 }
 
 get_instance_id() {
