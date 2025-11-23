@@ -47,7 +47,17 @@ git clone https://github.com/arachtivix/factorio-server-automation.git
 cd factorio-server-automation
 ```
 
-### 2. Configure the Server
+### 2. Run Pre-flight Check (Optional)
+
+Verify your environment has all prerequisites:
+
+```bash
+./scripts/preflight-check.sh
+```
+
+This checks for AWS CLI, credentials, and other requirements.
+
+### 3. Configure the Server
 
 Copy the example configuration and edit it with your preferences:
 
@@ -62,7 +72,7 @@ Key configuration options:
 - `FACTORIO_SERVER_NAME`: Your server name
 - `FACTORIO_USERNAME` and `FACTORIO_TOKEN`: Your Factorio credentials (for multiplayer)
 
-### 3. Run AWS Setup
+### 4. Run AWS Setup
 
 This creates all necessary AWS resources:
 
@@ -78,7 +88,7 @@ This script will:
 
 **Important**: The SSH key (`.pem` file) will be saved in the project root. Keep it safe!
 
-### 4. Deploy the Server
+### 5. Deploy the Server
 
 ```bash
 ./scripts/deploy-server.sh
@@ -92,7 +102,7 @@ This will:
 
 The deployment takes several minutes. You'll see the server's IP address when complete.
 
-### 5. Connect to Your Server
+### 6. Connect to Your Server
 
 Use the Factorio game client to connect to: `<SERVER_IP>:34197`
 
