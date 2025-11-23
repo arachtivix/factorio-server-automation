@@ -1,0 +1,32 @@
+# Terraform state files
+*.tfstate
+*.tfstate.*
+.terraform/
+.terraform.lock.hcl
+
+# AWS credentials
+*.pem
+*.key
+
+# Configuration files with secrets
+config/secrets.env
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+*.tmp
+tmp/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.venv/
+venv/
